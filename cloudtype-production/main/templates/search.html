@@ -8,7 +8,7 @@
             <div class="sticky-container">
                 <form method="get" action="{% url 'search' %}" class="search-form">
                     <div class="search-icon-container">
-                        <img src="{% static 'img/search.png' %}" class="search-icon" />
+                        <img src="{{ cafe.cafe_photo.url }}" class="search-icon" alt="{{cafe.cafe_name}}" />
                     </div>
                     <input
                         type="text"
