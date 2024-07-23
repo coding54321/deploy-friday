@@ -52,3 +52,8 @@ class CustomLoginForm(LoginForm):
         label="비밀번호",
         widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': '비밀번호'}),
     )
+
+class SocialSignupForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ['name', 'telephone']

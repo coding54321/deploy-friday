@@ -11,6 +11,7 @@ from geopy.distance import distance
 from django.utils import timezone
 from django.contrib.auth.hashers import check_password
 from django.contrib.auth import get_user_model
+from .forms import SocialSignupForm
 import json
 from datetime import timedelta
 from django.db.models import Count
@@ -25,6 +26,16 @@ from allauth.account.views import SignupView as AllauthSignupView
 from django.urls import reverse_lazy
 from allauth.account.utils import complete_signup
 from allauth.account import app_settings
+from allauth.socialaccount.models import SocialAccount
+from allauth.socialaccount.helpers import complete_social_login
+from django.shortcuts import render, redirect
+from django.contrib.auth import login as auth_login
+from django.contrib.auth.decorators import login_required
+from allauth.socialaccount.models import SocialAccount, SocialLogin
+from allauth.account.utils import complete_signup
+from allauth.exceptions import ImmediateHttpResponse
+from allauth.socialaccount.helpers import complete_social_login
+
 
 class CustomSignupView(AllauthSignupView):
     form_class = UserSignupForm
@@ -135,10 +146,11 @@ def all_cafes(request):
         }
         return render(request, 'region.html', context)
     
-def cafe_detail(request, cafe_id):
-    cafe = get_object_or_404(Cafe, cafe_id=cafe_id)
+def cafe_detail(request, id):
+    cafe = get_object_or_404(Cafe, id=id)
     seats = Seat.objects.filter(cafe=cafe)
     is_liked = False
+    
     if request.user.is_authenticated:
         is_liked = Favorite.objects.filter(user=request.user, cafe=cafe, liked=True).exists()
     
@@ -259,28 +271,35 @@ def user_signup(request):
         form = UserSignupForm()
     return render(request, 'account/signup.html', {'form': form})
 
-@login_required
 def social_signup(request):
     if request.method == 'POST':
         name = request.POST.get('name')
         phone_number = request.POST.get('phone')
 
         if not name or not phone_number:
-            return HttpResponseBadRequest('Invalid input')
+            return HttpResponseBadRequest('이름과 전화번호를 입력해주세요.')
 
         user = request.user
         if user.is_authenticated:
-            user.name = name
-            user.telephone = phone_number
-            user.save()
+            try:
+                existing_user = User.objects.get(user_id=user.user_id)
+                # Update the existing user's details
+                existing_user.name = name
+                existing_user.telephone = phone_number
+                existing_user.save()
+            except User.DoesNotExist:
+                # Create a new user
+                user.name = name
+                user.telephone = phone_number
+                user.save()
 
-            print(f"User {user.username} updated with name: {name}, phone: {phone_number}")
-            login(request, user)
-
-        return redirect('home')
+            # Automatically log the user in and redirect to home
+            auth_login(request, user, backend='django.contrib.auth.backends.ModelBackend')
+            return redirect('home')
     else:
-        return render(request, 'main/social_signup.html')
+        return render(request, 'social_signup.html')
 
+    return HttpResponseBadRequest('잘못된 요청입니다.')
 
 def user_login(request):
     if request.method == 'POST':
