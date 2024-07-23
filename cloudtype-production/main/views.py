@@ -3,6 +3,7 @@ from django.contrib.auth import login as auth_login, logout as auth_logout
 from django.contrib.auth import get_user, authenticate, login
 from django.contrib.auth.decorators import login_required
 from .models import User, Cafe, Seat, Favorite, Reservation
+from django.http import HttpResponseBadRequest
 from django.db.models import Q
 from django.contrib import messages
 from django.http import JsonResponse
@@ -258,19 +259,27 @@ def user_signup(request):
         form = UserSignupForm()
     return render(request, 'account/signup.html', {'form': form})
 
+@login_required
 def social_signup(request):
     if request.method == 'POST':
-        name = request.POST.get('이름')
-        phone_number = request.POST.get('전화번호')
+        name = request.POST.get('name')
+        phone_number = request.POST.get('phone')
+
+        if not name or not phone_number:
+            return HttpResponseBadRequest('Invalid input')
 
         user = request.user
-        user.name = name
-        user.telephone = phone_number
-        user.save()
+        if user.is_authenticated:
+            user.name = name
+            user.telephone = phone_number
+            user.save()
+
+            print(f"User {user.username} updated with name: {name}, phone: {phone_number}")
+            login(request, user)
 
         return redirect('home')
     else:
-        return render(request, 'social_signup.html')
+        return render(request, 'main/social_signup.html')
 
 
 def user_login(request):

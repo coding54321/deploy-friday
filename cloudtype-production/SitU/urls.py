@@ -18,6 +18,7 @@ urlpatterns = [
     path('<int:user_id>/', views.user_profile, name='user_profile'),
     path('ajax/search/', views.ajax_search, name='ajax_search'),
     path('accounts/', include('allauth.urls')),
+    #path('social-signup/', views.social_signup, name='social_signup'),
     path('social-signup/', views.social_signup, name='social_signup'),
     path('account/login/', views.user_login, name='account_login'),
     path('account/logout/', views.user_logout, name='account_logout'),

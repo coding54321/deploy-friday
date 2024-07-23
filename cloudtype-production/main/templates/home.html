@@ -56,7 +56,10 @@
                 function (position) {
                     var lat = position.coords.latitude;
                     var lng = position.coords.longitude;
-                    window.location.href = ?lat=${lat}&lng=${lng};
+                    var url = new URL(window.location.href);
+                    url.searchParams.set('lat', lat);
+                    url.searchParams.set('lng', lng);
+                    window.location.href = url.href;
                 },
                 function (error) {
                     console.error('Error getting location:', error);
@@ -68,12 +71,10 @@
         }
     }
 
-    // URL에 이미 lat와 lng 매개변수가 있는지 확인
     const urlParams = new URLSearchParams(window.location.search);
     const hasLatLng = urlParams.has('lat') && urlParams.has('lng');
 
     if (!hasLatLng) {
-        // URL에 매개변수가 없으면 위치 기반 검색 수행
         getCurrentLocationAndRedirect();
     }
 
