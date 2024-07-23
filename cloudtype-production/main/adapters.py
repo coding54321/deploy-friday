@@ -1,9 +1,11 @@
-# main/adapters.py
-
 from allauth.socialaccount.adapter import DefaultSocialAccountAdapter
-from django.shortcuts import redirect
-from allauth.core.exceptions import ImmediateHttpResponse
-from main.models import User  # 사용자 모델을 import
+from django.shortcuts import render, redirect
+from django.urls import reverse
+from allauth.exceptions import ImmediateHttpResponse
+from django.contrib import messages
+import logging
+
+logger = logging.getLogger(__name__)
 
 class MySocialAccountAdapter(DefaultSocialAccountAdapter):
     def pre_social_login(self, request, sociallogin):
@@ -23,4 +25,8 @@ class MySocialAccountAdapter(DefaultSocialAccountAdapter):
     def save_user(self, request, sociallogin, form=None):
         user = super().save_user(request, sociallogin, form)
         user.save()
+
+        if not sociallogin.is_existing:
+            raise ImmediateHttpResponse(render(request, 'social_signup.html', {'form': SocialSignupForm()}))
+
         return user

@@ -17,7 +17,6 @@ urlpatterns = [
     path('like/<int:user_id>/', views.user_likes, name='user_likes'),
     path('<int:user_id>/', views.user_profile, name='user_profile'),
     path('ajax/search/', views.ajax_search, name='ajax_search'),
-    path('accounts/', include('allauth.urls')),
     path('account/login/', views.user_login, name='account_login'),
     path('account/logout/', views.user_logout, name='account_logout'),
     path('all_cafes/', views.all_cafes, name='all_cafes'),
