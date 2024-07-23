@@ -1,0 +1,13 @@
+<!doctype html>
+<html>
+    <head>
+        <title>사장님 Login</title>
+    </head>
+    <body>
+        <h2>어서오세요, 사장님!</h2>
+        <form method="post">
+            {% csrf_token %} {{ form.as_p }}
+            <button type="submit">Login</button>
+        </form>
+    </body>
+</html>
