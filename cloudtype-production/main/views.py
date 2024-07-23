@@ -345,9 +345,9 @@ def seat_map(request, id):
 @login_required
 def reservation_create(request, cafe_id, seat_id):
     user = request.user
-    template_name = f'seat_map/seat_map_{cafe_id}.html'
     cafe = get_object_or_404(Cafe, id=cafe_id)
     seats = Seat.objects.filter(cafe_id=cafe_id)
+    template_name = f'seat_map/seat_map_{cafe_id}.html'
 
     has_active_reservation = Reservation.objects.filter(
         user=user,
@@ -360,8 +360,7 @@ def reservation_create(request, cafe_id, seat_id):
     
     if request.method == 'POST':
         seat = get_object_or_404(Seat, id=seat_id)
-        
-        # 예약 생성
+ 
         reservation = Reservation.objects.create(
             user=user,
             cafe=cafe,
@@ -369,8 +368,7 @@ def reservation_create(request, cafe_id, seat_id):
             reservation_time=timezone.now(),
             number_of_people=request.POST.get('number_of_people')
         )
-        
-        # 좌석 상태를 'requesting'으로 업데이트
+
         seat.seat_status = 'requesting'
         seat.save()
 
