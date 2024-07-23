@@ -1,25 +1,26 @@
+# main/adapters.py
+
 from allauth.socialaccount.adapter import DefaultSocialAccountAdapter
-from allauth.core.exceptions import ImmediateHttpResponse
 from django.shortcuts import redirect
-from allauth.socialaccount.models import SocialAccount
-from django.urls import reverse
+from allauth.core.exceptions import ImmediateHttpResponse
+from main.models import User  # 사용자 모델을 import
 
 class MySocialAccountAdapter(DefaultSocialAccountAdapter):
     def pre_social_login(self, request, sociallogin):
-        # If the user is already authenticated, don't do anything
-        if request.user.is_authenticated:
+        if sociallogin.is_existing:
             return
 
-        # If social account already exists, link to the existing user and login
+        user = sociallogin.user
+        if not user.email:
+            return
+
         try:
-            account = SocialAccount.objects.get(provider=sociallogin.account.provider, uid=sociallogin.account.uid)
-            user = account.user
-            # If the user already exists, redirect to home
-            if user:
-                raise ImmediateHttpResponse(redirect(reverse('home')))
-        except SocialAccount.DoesNotExist:
+            existing_user = User.objects.get(email=user.email)
+            sociallogin.connect(request, existing_user)
+        except User.DoesNotExist:
             pass
 
     def save_user(self, request, sociallogin, form=None):
         user = super().save_user(request, sociallogin, form)
+        user.save()
         return user

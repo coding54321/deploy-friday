@@ -137,7 +137,7 @@ AUTH_USER_MODEL = 'main.User'
 
 # Django Allauth settings
 ACCOUNT_LOGOUT_ON_GET = True
-SOCIALACCOUNT_AUTO_SIGNUP = False
+SOCIALACCOUNT_AUTO_SIGNUP = True
 SOCIALACCOUNT_LOGIN_ON_GET = True
 SOCIALACCOUNT_ADAPTER = 'main.adapters.MySocialAccountAdapter'
 

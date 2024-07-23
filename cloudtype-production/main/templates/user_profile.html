@@ -3,18 +3,22 @@
 
 <div class="screen">
     <div class="profile-container">
-        <h2 class="mt-4">반갑습니다! {{user.name}}님</h2>
+        <h2 class="mt-4">반갑습니다! {{ user.name|default:nickname }}님</h2>
         <div class="profile-info"></div>
         <div class="reservations">
             <h3>현재 예약</h3>
             {% if current_reservations %} {% for reservation in current_reservations %}
             <div class="card-content">
                 <div class="card-image">
-                    <img src="{{ cafe.cafe_photo.url }}" class="card-img" alt="{{ cafe.cafe_name }}" />
+                    <img
+                        src="{{ reservation.cafe.cafe_photo.url }}"
+                        class="card-img"
+                        alt="{{ reservation.cafe.cafe_name }}"
+                    />
                 </div>
                 <div class="card-body">
                     <h5 class="card-title">
-                        <a href="{% url 'cafe_detail' reservation.cafe_id %}">{{ reservation.cafe.cafe_name }}</a>
+                        <a href="{% url 'cafe_detail' reservation.cafe.id %}">{{ reservation.cafe.cafe_name }}</a>
                     </h5>
                     <p class="card-text">
                         {{ reservation.cafe.cafe_time }}<br />

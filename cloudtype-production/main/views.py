@@ -35,6 +35,11 @@ from allauth.socialaccount.models import SocialAccount, SocialLogin
 from allauth.account.utils import complete_signup
 from allauth.exceptions import ImmediateHttpResponse
 from allauth.socialaccount.helpers import complete_social_login
+from django.http import HttpResponseBadRequest
+from django.contrib.auth import login as auth_login
+from .models import User
+from .forms import SocialSignupForm
+from allauth.socialaccount.models import SocialAccount
 
 
 class CustomSignupView(AllauthSignupView):
@@ -244,9 +249,17 @@ def user_profile(request, user_id):
     ).order_by('-reservation_time')
     
     has_active_reservation = current_reservations.exists()
-    
+
+    try:
+        social_account = SocialAccount.objects.get(user=user)
+        extra_data = social_account.extra_data
+        nickname = extra_data['kakao_account']['profile']['nickname'] if 'kakao_account' in extra_data else ''
+    except SocialAccount.DoesNotExist:
+        nickname = ''
+
     context = {
         'user': user,
+        'nickname': nickname,
         'current_reservations': current_reservations,
         'past_reservations': past_reservations,
         'has_active_reservation': has_active_reservation,
@@ -273,33 +286,24 @@ def user_signup(request):
 
 def social_signup(request):
     if request.method == 'POST':
-        name = request.POST.get('name')
-        phone_number = request.POST.get('phone')
-
-        if not name or not phone_number:
-            return HttpResponseBadRequest('이름과 전화번호를 입력해주세요.')
-
-        user = request.user
-        if user.is_authenticated:
-            try:
-                existing_user = User.objects.get(user_id=user.user_id)
-                # Update the existing user's details
-                existing_user.name = name
-                existing_user.telephone = phone_number
-                existing_user.save()
-            except User.DoesNotExist:
-                # Create a new user
-                user.name = name
-                user.telephone = phone_number
+        form = SocialSignupForm(request.POST)
+        if form.is_valid():
+            if request.user.is_authenticated:
+                user = request.user
+                user.name = form.cleaned_data['name']
+                user.telephone = form.cleaned_data['telephone']
                 user.save()
 
-            # Automatically log the user in and redirect to home
-            auth_login(request, user, backend='django.contrib.auth.backends.ModelBackend')
-            return redirect('home')
+                # 로그인 처리 후 홈으로 리다이렉트
+                auth_login(request, user, backend='django.contrib.auth.backends.ModelBackend')
+                return redirect('home')
+            else:
+                return HttpResponseBadRequest('사용자가 인증되지 않았습니다.')
+        else:
+            return render(request, 'social_signup.html', {'form': form})
     else:
-        return render(request, 'social_signup.html')
-
-    return HttpResponseBadRequest('잘못된 요청입니다.')
+        form = SocialSignupForm()
+        return render(request, 'social_signup.html', {'form': form})
 
 def user_login(request):
     if request.method == 'POST':
