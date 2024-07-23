@@ -1,5 +1,6 @@
 from django import forms
 from django.contrib.auth import get_user_model
+from allauth.account.forms import LoginForm
 
 User = get_user_model()
 
@@ -10,6 +11,12 @@ class UserSignupForm(forms.ModelForm):
     class Meta:
         model = User
         fields = ['name', 'user_id', 'telephone']
+        labels = {
+            'name': "이름",
+            'user_id':"아이디",
+            'telephone':'전화번호',
+            
+        }
 
     def clean(self):
         cleaned_data = super().clean()
@@ -36,3 +43,12 @@ class UserSignupForm(forms.ModelForm):
             print(f"An error occurred: {e}")
             return None, self.get_invalid_response(request)
 
+class CustomLoginForm(LoginForm):
+    login = forms.CharField(
+        label="아이디",
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': '아이디'}),
+    )
+    password = forms.CharField(
+        label="비밀번호",
+        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': '비밀번호'}),
+    )

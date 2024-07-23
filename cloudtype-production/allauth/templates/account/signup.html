@@ -8,6 +8,7 @@
         <div class="separator"></div>
         <form method="post" action="{% url 'account_signup' %}" onsubmit="return checkForm()">
             {% csrf_token %} {{ form.as_p }}
+            <div id="passwordMatchMessage" style="opacity: 0"></div>
             <div class="separator"></div>
             <!-- 개인정보 수집 및 이용 동의 추가 -->
             <div class="privacy-consent">
@@ -46,8 +47,8 @@
 </div>
 <script>
     function checkPasswordMatch() {
-        var password = document.getElementById('password').value;
-        var passwordConfirm = document.getElementById('password_confirm').value;
+        var password = document.getElementById('id_password1').value;
+        var passwordConfirm = document.getElementById('id_password2').value;
         var messageElement = document.getElementById('passwordMatchMessage');
 
         if (password === '' && passwordConfirm === '') {
@@ -64,9 +65,12 @@
         }
     }
 
+    document.getElementById('id_password1').addEventListener('input', checkPasswordMatch);
+    document.getElementById('id_password2').addEventListener('input', checkPasswordMatch);
+
     function checkForm() {
-        var password = document.getElementById('password').value;
-        var passwordConfirm = document.getElementById('password_confirm').value;
+        var password = document.getElementById('id_password1').value;
+        var passwordConfirm = document.getElementById('id_password2').value;
 
         if (password !== passwordConfirm) {
             alert('비밀번호가 일치하지 않습니다.');

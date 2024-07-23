@@ -260,8 +260,8 @@ def user_signup(request):
 
 def social_signup(request):
     if request.method == 'POST':
-        name = request.POST.get('name')
-        phone_number = request.POST.get('phone')
+        name = request.POST.get('이름')
+        phone_number = request.POST.get('전화번호')
 
         user = request.user
         user.name = name

@@ -151,6 +151,7 @@ ACCOUNT_USERNAME_REQUIRED = True
 ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_FORMS = {
     'signup': 'main.forms.UserSignupForm',
+    'login': 'main.forms.CustomLoginForm',
 }
 
 # Default primary key field type
