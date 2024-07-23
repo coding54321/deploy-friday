@@ -253,7 +253,14 @@ def user_profile(request, user_id):
     try:
         social_account = SocialAccount.objects.get(user=user)
         extra_data = social_account.extra_data
-        nickname = extra_data['kakao_account']['profile']['nickname'] if 'kakao_account' in extra_data else ''
+        # Check for Kakao account nickname
+        if 'kakao_account' in extra_data:
+            nickname = extra_data['kakao_account']['profile']['nickname']
+        # Check for Naver account nickname
+        elif 'name' in extra_data:
+            nickname = extra_data['name']
+        else:
+            nickname = ''
     except SocialAccount.DoesNotExist:
         nickname = ''
 
@@ -328,10 +335,10 @@ def user_logout(request):
 
 # 예약
 @login_required
-def seat_map(request, cafe_id):
-    cafe = get_object_or_404(Cafe, id=cafe_id)
-    seats = Seat.objects.filter(cafe_id=cafe_id)
-    template_name = f'seat_map/seat_map_{cafe_id}.html' 
+def seat_map(request, id):
+    cafe = get_object_or_404(Cafe, id=id)
+    seats = Seat.objects.filter(cafe_id=id)
+    template_name = f'seat_map/seat_map_{id}.html' 
     
     return render(request, template_name, {'cafe': cafe, 'seats': seats})
 

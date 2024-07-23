@@ -3,7 +3,10 @@
 
 <div class="screen">
     <div class="profile-container">
-        <h2 class="mt-4">반갑습니다! {{ user.name|default:nickname }}님</h2>
+        <h2 class="mt-4">
+            반갑습니다! {% if user.name %} {{ user.name }} {% elif nickname %} {{ nickname }} {% elif extra_data.name %}
+            {{ extra_data.name }} {% else %} 사용자 {% endif %} 님
+        </h2>
         <div class="profile-info"></div>
         <div class="reservations">
             <h3>현재 예약</h3>
