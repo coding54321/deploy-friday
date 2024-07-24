@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', function () {
     var closeButton = document.getElementById('popup-close');
     var selectedSeatId = '';
 
-    document.querySelectorAll('.seat').forEach(function (seat) {
+    document.querySelectorAll('.seat', '.box').forEach(function (seat) {
         seat.addEventListener('click', function () {
             var seatId = this.id;
             var seatNo = this.querySelector('.seat.table').textContent;
@@ -27,8 +27,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 <div class="seat-features-container">
                   <span class="seat-feature ${plug ? 'available' : 'unavailable'}">플러그${plug ? 'O' : 'X'}</span> 
                   <span class="seat-feature ${backseat ? 'available' : 'unavailable'}">등받이${
-                    backseat ? 'O' : 'X'
-                }</span>
+                      backseat ? 'O' : 'X'
+                  }</span>
                 </div>
               `;
 
@@ -87,5 +87,12 @@ function showFloor(floor) {
 document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('floor2Button').addEventListener('click', function () {
         showFloor('floor2');
+    });
+});
+
+//스터디룸 클릭시 알림창
+document.querySelectorAll('#floor2.box, .studyroom').forEach(function (element) {
+    element.addEventListener('click', function () {
+        alert('스터디룸 예약 기능은 준비 중입니다!');
     });
 });
